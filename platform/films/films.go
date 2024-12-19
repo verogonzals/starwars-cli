@@ -6,10 +6,11 @@ import (
 	"log"
 	"net/http"
 	"sort"
+	"time"
+
 	"star-wars-cli/platform"
 	planets "star-wars-cli/platform/planets"
 	"star-wars-cli/utils"
-	"time"
 )
 
 func FilmsListByReleaseDate() error {
