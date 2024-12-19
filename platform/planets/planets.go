@@ -2,9 +2,11 @@ package platform
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
-	
+	"sync"
+
 	"star-wars-cli/platform"
 	"star-wars-cli/utils"
 )
@@ -59,4 +61,30 @@ func GetPlanetsList() error {
 	utils.Print(planets)
 
 	return nil
+}
+
+func GetPlanetName(url string, wg *sync.WaitGroup, mu *sync.Mutex, planetNames *[]string) {
+	defer wg.Done()
+
+	var planet Planet
+	response, err := http.Get(url)
+	if err != nil {
+		fmt.Printf("Failed getting planet: %v\n", err)
+		return
+	}
+
+	// Read response body
+	resBytes, err := io.ReadAll(response.Body)
+	if err != nil {
+		return
+	}
+
+	err = json.Unmarshal(resBytes, &planet)
+	if err != nil {
+		return
+	}
+
+	mu.Lock()
+	*planetNames = append(*planetNames, planet.Name)
+	mu.Unlock()
 }

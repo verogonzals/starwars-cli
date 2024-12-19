@@ -3,9 +3,9 @@ package platform
 import (
 	"encoding/json"
 	"io"
-	"log"
 	"net/http"
 	"sort"
+	"sync"
 	"time"
 
 	"star-wars-cli/platform"
@@ -26,14 +26,30 @@ func FilmsListByReleaseDate() error {
 	// 3. Get the planets information and generate the result
 	result := make(map[string][]string)
 
+	// for _, film := range films {
+	// 	planetNames, err := planets.GetPlanetByURL(film.Planets)
+	// 	if err != nil {
+	// 		log.Printf("Error retrieving planets by film %s: %v", film.Title, err)
+	// 		continue
+	// 	}
+
+	// 	// Sort planet names alphabetically
+	// 	sort.Strings(planetNames)
+	// 	result[film.Title] = planetNames
+	// }
+
+	// using concurrency OPT
 	for _, film := range films {
-		planetNames, err := planets.GetPlanetByURL(film.Planets)
-		if err != nil {
-			log.Printf("Error retrieving planets by film %s: %v", film.Title, err)
-			continue
+		var wg sync.WaitGroup
+		var mu sync.Mutex
+		var planetNames []string
+
+		for _, planetURL := range film.Planets {
+			wg.Add(1)
+			go planets.GetPlanetName(planetURL, &wg, &mu, &planetNames)
 		}
 
-		// Sort planet names alphabetically
+		wg.Wait()
 		sort.Strings(planetNames)
 		result[film.Title] = planetNames
 	}
