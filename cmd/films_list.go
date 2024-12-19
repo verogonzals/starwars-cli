@@ -16,9 +16,6 @@ var filmsListCmd = &cobra.Command{
 	},
 }
 
-// Function in charge of
-func init(){}
-
 
 
 

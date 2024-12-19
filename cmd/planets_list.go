@@ -17,7 +17,7 @@ var planetListCmd = &cobra.Command{
 }
 
 
-func init(){}
+
 
 
 
